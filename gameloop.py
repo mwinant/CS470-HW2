@@ -97,9 +97,47 @@ def evaluate_window(window, player):
         score -= 4
     return score
 
+# def negamax(board, depth, alpha, beta, player):
+#     opponent = 'O' if player == 'X' else 'X'
+#     valid_locations = [c for c in range(COLS) if board[0][c] == ' ']
+#     is_terminal = is_winner(board, player) or is_winner(board, opponent) or is_draw(board)
+
+#     if depth == 0 or is_terminal:
+#         if is_terminal:
+#             if is_winner(board, player):
+#                 return (None, 100000000000000)
+#             elif is_winner(board, opponent):
+#                 return (None, -10000000000000)
+#             else:  # Game is over, no more valid moves
+#                 return (None, 0)
+#         else:  # Depth is zero
+#             return (None, score_position(board, player))
+
+#     value = -math.inf
+#     column = valid_locations[0]
+#     for col in valid_locations:
+#         row = next(r for r in range(ROWS - 1, -1, -1) if board[r][col] == ' ')
+#         board[row][col] = player
+#         new_score = -negamax(board, depth - 1, -beta, -alpha, opponent)[1]
+#         board[row][col] = ' '
+#         if new_score > value:
+#             value = new_score
+#             column = col
+#         alpha = max(alpha, value)
+#         if alpha >= beta:
+#             break
+
+#     return column, value
+
 def negamax(board, depth, alpha, beta, player):
     opponent = 'O' if player == 'X' else 'X'
     valid_locations = [c for c in range(COLS) if board[0][c] == ' ']
+
+    # Reorder valid_locations to prioritize the middle column and alternate outward
+    middle = COLS // 2
+    reordered_locations = [middle] + [middle + i for i in range(1, middle + 1)] + [middle - i for i in range(1, middle + 1)]
+    valid_locations = [col for col in reordered_locations if col in valid_locations]
+
     is_terminal = is_winner(board, player) or is_winner(board, opponent) or is_draw(board)
 
     if depth == 0 or is_terminal:
@@ -128,6 +166,7 @@ def negamax(board, depth, alpha, beta, player):
             break
 
     return column, value
+
 
 def best_move(board, player, depth):
     column, _ = negamax(board, depth, -math.inf, math.inf, player)
