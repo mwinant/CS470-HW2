@@ -7,6 +7,7 @@ init(autoreset=True)
 ROWS = 6
 COLS = 7
 CONNECT_N = 4
+MAX_DEPTH = 5
 
 def print_board(board):
     print("  " + "   ".join(map(str, range(COLS))))
@@ -94,40 +95,9 @@ def evaluate_window(window, player):
     elif window.count(player) == 2 and window.count(' ') == 2:
         score += 2
     if window.count(opponent) == 3 and window.count(' ') == 1:
-        score -= 4
+        score -= 10
     return score
 
-# def negamax(board, depth, alpha, beta, player):
-#     opponent = 'O' if player == 'X' else 'X'
-#     valid_locations = [c for c in range(COLS) if board[0][c] == ' ']
-#     is_terminal = is_winner(board, player) or is_winner(board, opponent) or is_draw(board)
-
-#     if depth == 0 or is_terminal:
-#         if is_terminal:
-#             if is_winner(board, player):
-#                 return (None, 100000000000000)
-#             elif is_winner(board, opponent):
-#                 return (None, -10000000000000)
-#             else:  # Game is over, no more valid moves
-#                 return (None, 0)
-#         else:  # Depth is zero
-#             return (None, score_position(board, player))
-
-#     value = -math.inf
-#     column = valid_locations[0]
-#     for col in valid_locations:
-#         row = next(r for r in range(ROWS - 1, -1, -1) if board[r][col] == ' ')
-#         board[row][col] = player
-#         new_score = -negamax(board, depth - 1, -beta, -alpha, opponent)[1]
-#         board[row][col] = ' '
-#         if new_score > value:
-#             value = new_score
-#             column = col
-#         alpha = max(alpha, value)
-#         if alpha >= beta:
-#             break
-
-#     return column, value
 
 def negamax(board, depth, alpha, beta, player):
     opponent = 'O' if player == 'X' else 'X'
@@ -176,7 +146,6 @@ def play_game():
     board = [[' ' for _ in range(COLS)] for _ in range(ROWS)]
     player = input("Please choose your gamepiece, X to go first, O to go second (X/O): ").upper()
     current_player = 'X'
-    max_depth = 5
 
     while True:
         print_board(board)
@@ -200,8 +169,9 @@ def play_game():
                 print("Invalid move. Try again.")
         else:
             start_time = time.time()
-            move = best_move(board, current_player, max_depth)
+            move = best_move(board, current_player, MAX_DEPTH)
             end_time = time.time()
+            print(f"AI move took {end_time - start_time:.2f} seconds.")
             if move is not None:
                 row = next(r for r in range(ROWS - 1, -1, -1) if board[r][move] == ' ')
                 board[row][move] = current_player
